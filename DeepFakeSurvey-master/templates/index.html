@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Deep Fake Survey</title>
+</head>
+<body>
+    <style>
+        .off {
+            display:none;
+        }
+
+        .on {
+            display: inline;
+        }
+
+        body{
+            margin-left: 33%; 
+        }
+
+        form {
+            margin-left: 20%;
+        }
+
+    </style>
+    <div id="image_div">
+    {%for key in data%}
+        <img src= "{{url_for('static', filename=key)}}" alt="Image not found" class="off">
+    {%endfor%}
+    </div>
+    <br>
+    <p>{{counter}}</p>
+    <form action="/empty" method="post">
+        <input type="button" value="fake" class="btn btn-danger">
+        <input type="button" value="real" class="btn btn-success">
+    </form>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    
+<script>
+
+    $(document).ready(function(){
+        var image_list = $('#image_div').children();
+        var image_index = 0;
+        var user_choice = {};
+
+        image_list[0].className = "on";
+
+        var buttons = $("input")
+        buttons.on("click", function(e){
+            
+
+            var val = -1;
+            if (e.currentTarget.value == "fake"){
+                val = 0;
+            } else {
+                val = 1;
+            }
+            var url = image_list[image_index].src;
+            var re = /real-and-fake-face-detection\/real_and_fake_face\/training_(real|fake)\/\w+.jpg/g
+            url = url.match(re)[0]
+            user_choice[url] = val;
+
+            image_list[image_index++].className = "off";
+            if(image_index == 10){
+                // $.ajax({
+                //     type: "POST",
+                //     url: "/postmethod",
+                //     contentType: "application/json; charset=utf-8",
+                //     data: user_choice,
+                //     dataType: "json",
+                //     success: function (msg) {
+                //         alert("Success");
+                //     }
+                // });
+
+
+                // $.ajax({
+                //     url: Flask.url_for('my_function'),
+                //     type: 'POST',
+                //     data: JSON.stringify(user_choice),   // converts js value to JSON string
+                // }).done(function(result){     // on success get the return object from server
+                //     console.log(result)     // do whatever with it. In this case see it in console
+                // });
+
+                $.ajax({
+                 type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(user_choice),
+                dataType: 'json',
+                url: '/postmethod',
+                success: function (e) {
+                    console.log(e);
+
+                },
+                error: function(error) {
+                    $('form').submit();
+                }
+                });
+
+
+
+            } else {
+                image_list[image_index].className = "on";
+            }
+
+            console.log(user_choice)
+        });
+        
+    });
+
+</script>
+</html>

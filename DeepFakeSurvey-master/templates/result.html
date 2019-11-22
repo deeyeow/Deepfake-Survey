@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Deep Fake Survey Results</title>
+</head>
+<style>
+    .images{
+        margin: auto;
+        padding: 10px;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+    p{
+        font-size: 2em;
+    }
+</style>
+<body>
+    {%for key, val in data.items()%}
+    <div class="images">
+        <img src= "{{url_for('static', filename=key)}}" alt="Image not found" class="off">
+        <div>
+            {%if val['choice'] == 1%}
+                <p>You voted that the image was real</p>
+            {%else%}
+                <p>You voted that the image was fake</p>
+            {%endif%}
+                <p>{{100 * val['real'] / (val['real'] + val['fake']) }}% ({{val['real']}}) Thought was real and {{ 100 * val['fake'] / (val['real']+ val['fake']) }}% ({{val['fake']}})Thought was fake</p>
+            <p>The model predicted it was {{"Real" if val['model'] > 0.5 else "Fake"}} with a certainty of {{val['model']}} being real</p>
+            <p>The picture actually is {{val['ans'] }}</p>
+        </div>  
+    </div>
+    {%endfor%}
+</body>
+</html>
